@@ -1,0 +1,50 @@
+#include <DHT.h>
+
+String card1="54006EAF8E1B";
+String card2="18008A468E5A";
+
+DHT dht(3,DHT11);
+
+int buzzer=5;
+int mq=4;
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(mq,INPUT);
+  pinMode(buzzer,OUTPUT);
+}
+
+void loop() {  
+  float h=dht.readHumidity();
+  float t=dht.readTemperature();
+  int m=digitalRead(mq);
+  
+  if(isnan(h) || isnan(t)) 
+  return;
+
+  Serial.print("Humidity: ");
+  Serial.print(h);
+  Serial.print(", Temperature: ");
+  Serial.print(t);
+  Serial.print(", MQ: ");
+  Serial.print(m);
+  Serial.println();
+  if(m==0) {
+      digitalWrite(buzzer,1);
+      Serial.println("#Rotten Smell");
+      delay(2000);
+      digitalWrite(buzzer,0);
+      }
+  while(Serial.available()){
+    String s=Serial.readString();
+    Serial.println(s);
+    if(s==card1) {
+      Serial.println("Bag1");
+    } else if(s==card2) {
+      Serial.println("Bag2");
+    }
+    
+  }
+  delay(2000);
+}
